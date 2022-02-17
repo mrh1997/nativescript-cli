@@ -10,7 +10,7 @@ export class IOSLogFilter implements Mobile.IPlatformLogFilter {
 	// This: "May 24 15:54:52 Dragons-iPhone NativeScript250(NativeScript)[356] <Notice>: CONSOLE ERROR file:///app/tns_modules/@angular/core/bundles/core.umd.js:3477:36: ORIGINAL STACKTRACE:"
 	// Becomes: CONSOLE ERROR file:///app/tns_modules/@angular/core/bundles/core.umd.js:3477:36: ORIGINAL STACKTRACE:
 	protected infoFilterRegex = new RegExp(
-		`^.*(?:<Notice>:|<Error>:|<Warning>:|\\(NativeScript\\)|${this.appOutputRegex.source}:){1}`
+		`^.*(?:<Notice>:|<Error>|<Warning>:|${this.appOutputRegex.source}:) CONSOLE {1}`
 	);
 
 	private filterActive: boolean = true;
@@ -67,11 +67,11 @@ export class IOSLogFilter implements Mobile.IPlatformLogFilter {
 
 			const filteredLineInfo = currentLine.match(this.infoFilterRegex);
 			if (filteredLineInfo && filteredLineInfo.length > 0) {
-				currentLine = currentLine.replace(filteredLineInfo[0], "");
+				output =
+					"CONSOLE " +
+					currentLine.replace(filteredLineInfo[0], "").trim() +
+					"\n";
 			}
-
-			currentLine = currentLine.trim();
-			output += currentLine + "\n";
 		}
 
 		return output.length === 0 ? null : output;
